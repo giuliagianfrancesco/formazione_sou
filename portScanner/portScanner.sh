@@ -10,6 +10,7 @@ if [ $2 -lt 1024 ] || [ $3 -gt 49151 ]; then
 fi
 
 IFS='.' read -r -a ott <<< "$1"
+
 numOtt=0
 if [ -z ${$ott[3]} ]; then
         echo "ip errato"
@@ -37,4 +38,6 @@ do
         echo "porta connessa ${numPorta}"
     fi
     let numPorta=numPorta+1
+
+682941c (portScanner)
 done
