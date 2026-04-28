@@ -11,12 +11,13 @@ fi
 
 IFS='.' read -r -a ott <<< "$1"
 numOtt=0
-while [ ${numOtt} -le 3 ]
-do
-    if [ -z ${$ott[3]} ]; then
+if [ -z ${$ott[3]} ]; then
         echo "ip errato"
         exit 1;
-    fi
+fi
+while [ ${numOtt} -le 3 ]
+do
+    
 
     if [ ${ott[j]} -gt 255 ] || [ ${ott[j]} -lt 0 ]; then
         echo "ip errato"
