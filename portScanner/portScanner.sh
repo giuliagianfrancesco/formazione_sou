@@ -13,7 +13,7 @@ IFS='.' read -r -a ott <<< "$1"
 j=0
 while [ $j -le 3 ]
 do
-if [ -n ${$ott[3]} ]; then
+if [ -z ${$ott[3]} ]; then
 echo "ip errato"
 exit 1;
 fi
