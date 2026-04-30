@@ -2,11 +2,8 @@
 
 numPIDmax=$2
 numPIDmin=$1
+exitCode=0 
 
-if [ "$2" -lt "0" ]; then
-   ((exitCode++))
-
-fi
 if [ "$1" -gt "$2" ]; then
    let exitCode=exitCode+2
 
