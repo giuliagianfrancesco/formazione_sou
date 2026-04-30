@@ -16,7 +16,7 @@ count[D]=0
 count[T]=0
 count[I]=0
 
-checkStatus() { 
+checkStatus() {
 s=$1
 if [ "$s" == "S" ]; then
     let count[S]=count[S]+1
@@ -50,7 +50,7 @@ findStatus() {
     ps u -p $p > file.txt
     var=$(awk 'NR==2 {print $8}' file.txt)
     var=${var:0:1}
-    echo $var
+
 }
 
 proc=$numPIDmin
@@ -58,9 +58,17 @@ while [ "$proc" -le "$numPIDmax" ]
 do
 
     status=$(findStatus $proc)
-    checkStatus $status
+    ps u -p $p
+    res=$?
+    if [ $res -eq 0 ]; then
+
+        checkStatus "$status"
+    else
+        exitCode=$exitCode+$((exitCode + res))
+
+    fi
     ((proc++))
 done
-echo "Processi negli stati: Sleeping, Zombie, Running, Uninterruptible, Stopped, idle"
+
 echo "S: ${count[S]} | Z: ${count[Z]} | R: ${count[R]} | D: ${count[D]} | T: ${count[T]}, | I: ${count[I]}"
 exit $exitCode
