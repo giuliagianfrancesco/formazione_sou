@@ -1,5 +1,4 @@
 Vagrant.configure("2") do |config|
-  # Usiamo /vagrant che esiste di default
   config.vm.define "vm1" do |node1|
     node1.vm.box = "ubuntu/jammy64"
     node1.vm.hostname = "vm1"
