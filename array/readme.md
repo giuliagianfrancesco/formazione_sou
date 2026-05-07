@@ -12,4 +12,4 @@ Deduplication: Filters out repeated terms to return a list of unique values.
 Requirements
 Unix-like environment (Linux, macOS, WSL).
 
-Bash version 4.0 or higher.
+script2.sh uses same alghoritm for sorting but not need deduplicate strings because it uses a declarative array
