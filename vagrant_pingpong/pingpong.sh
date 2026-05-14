@@ -15,12 +15,12 @@ while true; do
         sleep 60
         
         echo "[$VM] Il minuto è scaduto"
-        sudo docker rm -f echo-server
         
+	sudo docker rm -f echo-server > /dev/null 2>&1        
         if [ "$VM" == "vm1" ]; then
-            echo "vm2" > "$FILE"
+            echo -n "vm2" > "$FILE"
         else
-            echo "vm1" > "$FILE"
+            echo -n "vm1" > "$FILE"
         fi
     fi 
     sleep 2
