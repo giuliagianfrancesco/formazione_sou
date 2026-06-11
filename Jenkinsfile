@@ -25,7 +25,7 @@ def buildAndPushTag(Map args) {
 pipeline {
       environment {
         K8S_NAMESPACE = 'formazione-sou'
-        CHART_PATH = 'helm-charts'
+        CHART_PATH = 'helm-chart'
         HELM_APP = 'formazione-sou-app'
   
     }
@@ -69,7 +69,6 @@ pipeline {
         stage('Deploy su cluster con Helm') {
             steps {
                 script{
-                    docker.image('dtzar/helm-kubectl:3.12.0').inside {
                     withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG_FILE')]){
                     sh """
                     helm upgrade --install \\
@@ -79,7 +78,7 @@ pipeline {
                     --namespace ${K8S_NAMESPACE} \\
                     --kubeconfig ${KUBECONFIG_FILE}
                 """
-                    }
+                    
                 }}
 
         }
