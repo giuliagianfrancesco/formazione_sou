@@ -11,6 +11,7 @@ COPY requirements.txt /appFlask
 # target/root/.cache/pip is the default directory where pip stores dependencies. It is copied in the PC and used as a cache in the next build.
 RUN --mount=type=cache,target=/root/.cache/pip pip3 install -r requirements.txt
  
+COPY app.py /appFlask
 
 ENTRYPOINT ["python3", "app.py"]
 
