@@ -88,7 +88,7 @@ pipeline {
     steps {
         withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
             sh """
-                kubectl get deployment ${HELM_APP} -n formazione-sou -o yaml > flask-deployment-export.yaml
+                kubectl get deployment formazione-sou-app-helm-chart -n formazione-sou -o yaml > flask-deployment-export.yaml
             """
             sh 'bash script_check.sh'
             
