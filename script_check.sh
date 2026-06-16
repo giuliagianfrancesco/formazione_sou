@@ -14,7 +14,7 @@ for container in $containers; do
     limits=$(kubectl get -f "$yaml_file" -o jsonpath="${BASE}.resources.limits")
     requests=$(kubectl get -f "$yaml_file" -o jsonpath="${BASE}.resources.requests")
     
-    if [ -z "$liveness" ] || [ -z "$readiness" ]|| [ -z "$limits" ] || [ -z "$requests" ]; then
+    if [ -z "$liveness" ] || [ -z "$readiness" ]|| [ -z "$limits" ] || [ -z "$requests" ]; then
         exit 1
 
     fi
