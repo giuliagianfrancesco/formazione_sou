@@ -86,7 +86,7 @@ pipeline {
     }
     stage('Export Deployment') {
     steps {
-        withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG_FILE')]) {
+        withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
             sh """
                 kubectl get deployment flask-app -n formazione-sou -o yaml > flask-deployment-export.yaml
             """
