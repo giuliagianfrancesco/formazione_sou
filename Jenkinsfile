@@ -73,7 +73,7 @@ pipeline {
                     sh """
                     helm upgrade --install \\
                     ${HELM_APP} \\
-                    --set image.tag=${env.IMAGE_TAG} \\
+ \\
                     ./${CHART_PATH} \\
                     --namespace ${K8S_NAMESPACE} \\
                     --kubeconfig ${KUBECONFIG_FILE}
@@ -84,6 +84,17 @@ pipeline {
         }
         
     }
+    stage('Export Deployment') {
+    steps {
+        withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG_FILE')]) {
+            sh """
+                kubectl get deployment flask-app -n formazione-sou -o yaml > flask-deployment-export.yaml
+            """
+            sh 'bash script_check.sh'
+            
+        }
+    }
+}
 }
 
 }
