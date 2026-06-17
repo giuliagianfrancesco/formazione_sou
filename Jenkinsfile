@@ -73,7 +73,7 @@ pipeline {
                     sh """
                     helm upgrade --install \\
                     ${HELM_APP} \\
- \\
+ 
                     ./${CHART_PATH} \\
                     --namespace ${K8S_NAMESPACE} \\
                     --kubeconfig ${KUBECONFIG_FILE}

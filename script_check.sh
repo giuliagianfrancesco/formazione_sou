@@ -16,7 +16,8 @@ for container in $containers; do
     
     if [ -z "$liveness" ] || [ -z "$readiness" ]|| [ -z "$limits" ] || [ -z "$requests" ]; then
         exit 1
-
+    else
+        echo "Container $container ha livenessProbe, readinessProbe, resource limits e resource requests configurati."
     fi
     
     
