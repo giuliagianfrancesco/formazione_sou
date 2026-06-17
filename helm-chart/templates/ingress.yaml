@@ -4,7 +4,7 @@ metadata:
   name: ingress-myservicea
 spec:
   rules:
-  - host: myservicea.foo.org
+  - host: formazionesou.local
     http:
       paths:
       - path: /
