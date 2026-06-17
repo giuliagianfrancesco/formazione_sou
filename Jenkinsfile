@@ -68,39 +68,35 @@ pipeline {
 }
         stage('Deploy su cluster con Helm') {
             steps {
-                script{
-                    withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG_FILE')]){
+                script {
+                    withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG_FILE')]) {
+                        sh """
+                            helm upgrade --install \
+                            ${HELM_APP} \
+                            ./${CHART_PATH} \
+                            --namespace ${K8S_NAMESPACE} \
+                            --kubeconfig "\${KUBECONFIG_FILE}"
+                        """
+                    }
+                }
+            }
+        }
+        stage('Export Deployment') {
+            steps {
+                withCredentials([string(credentialsId: 'serv-acc', variable: 'SERV_ACC')]) {
                     sh """
-                    helm upgrade --install \\
-                    ${HELM_APP} \\
- 
-                    ./${CHART_PATH} \\
-                    --namespace ${K8S_NAMESPACE} \\
-                    --kubeconfig ${KUBECONFIG_FILE}
-                """
-                    
-                }}
-
+                        kubectl get deployment formazione-sou-app-helm-chart \
+                          -n formazione-sou \
+                          -o yaml \
+                          --token="\${SERV_ACC}" \
+                          --server="https://192.168.64.2:8443" \
+                          --insecure-skip-tls-verify=true \
+                          > flask-deployment-export.yaml
+                    """
+                    sh 'bash script_check.sh'
+                }
+            }
         }
-        
-    }
-    stage('Export Deployment') {
-    steps {
-        withCredentials([string(credentialsId: 'serv-acc', variable: 'SERV_ACC')]) {
-            sh """
-                kubectl get deployment formazione-sou-app-helm-chart \
-                  -n formazione-sou \
-                  -o yaml \
-                  --token="\${SERV_ACC}" \
-                  --server="https://192.168.64.2:8443" \
-                  --insecure-skip-tls-verify=true \
-                  > flask-deployment-export.yaml
-            """
-            sh 'bash script_check.sh'
-            
-        }
-    }
-}
 }
 
 }
