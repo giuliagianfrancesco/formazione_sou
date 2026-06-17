@@ -88,8 +88,13 @@ pipeline {
     steps {
         withCredentials([string(credentialsId: 'serv-acc', variable: 'SERV_ACC')]) {
             sh """
-                kubectl get deployment formazione-sou-app-helm-chart -n formazione-sou -o yaml --token="\${SERV_ACC}" --server="https://192.168.64.2:8443/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy"
-                  --insecure-skip-tls-verify=true > flask-deployment-export.yaml
+                kubectl get deployment formazione-sou-app-helm-chart \
+                  -n formazione-sou \
+                  -o yaml \
+                  --token="\${SERV_ACC}" \
+                  --server="https://192.168.64.2:8443" \
+                  --insecure-skip-tls-verify=true \
+                  > flask-deployment-export.yaml
             """
             sh 'bash script_check.sh'
             
