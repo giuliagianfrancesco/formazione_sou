@@ -90,7 +90,8 @@ pipeline {
                         kubectl get deployment formazione-sou-app-helm-chart \
                           -n formazione-sou \
                           -o yaml \
-                          
+                          --server="https://10.0.2.2:8443" \
+                          --insecure-skip-tls-verify\
                           --kubeconfig "\${KUBECONFIG_FILE}" \
                           > flask-deployment-export.yaml
                     """
