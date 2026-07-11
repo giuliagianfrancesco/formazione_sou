@@ -9,8 +9,8 @@ def buildAndPushTag(Map args) {
     ]
     args = defaults + args
     docker.withRegistry('', args.credentialsId) {
-        def image = docker.build(args.image, "${args.buildArgs} ${args.dockerfileDir} -f ${args.dockerfileName}")
-        image.push(args.buildTag)
+        def image = docker.build("${args.image}:${args.buildTag}", "${args.buildArgs} ${args.dockerfileDir} -f ${args.dockerfileName}")
+        image.push()
         if(args.pushLatest) {
             image.push("latest")
             sh "docker rmi --force ${args.image}:latest"
@@ -23,14 +23,15 @@ def buildAndPushTag(Map args) {
 }
 
 pipeline {
-      environment {
+     
+  agent { label 'agent-docker-1' }
+  environment {
         K8S_NAMESPACE = 'formazione-sou'
         CHART_PATH = 'helm-chart'
         HELM_APP = 'formazione-sou-app'
-  
+        IMAGE_NAME    = 'giulia00/formazione_sou_k8s'
     }
 
-    agent { label 'Jenkins-agent' }
     stages {
         stage('Checkout') {
             steps {
@@ -75,6 +76,7 @@ pipeline {
                             ${HELM_APP} \
                             ./${CHART_PATH} \
                             --namespace ${K8S_NAMESPACE} \
+                            --set image.tag=${IMAGE_TAG} \
                             --kubeconfig "\${KUBECONFIG_FILE}"
                         """
                     }
@@ -83,14 +85,13 @@ pipeline {
         }
         stage('Export Deployment') {
             steps {
-                withCredentials([string(credentialsId: 'serv-acc', variable: 'SERV_ACC')]) {
+                withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG_FILE')]) {
                     sh """
                         kubectl get deployment formazione-sou-app-helm-chart \
                           -n formazione-sou \
                           -o yaml \
-                          --token="\${SERV_ACC}" \
-                          --server="https://192.168.64.2:8443" \
-                          --insecure-skip-tls-verify=true \
+                          
+                          --kubeconfig "\${KUBECONFIG_FILE}" \
                           > flask-deployment-export.yaml
                     """
                     sh 'bash script_check.sh'
