@@ -59,19 +59,4 @@ Il cluster Minikube espone l'API server solo su `127.0.0.1` del Mac quindi non r
 kubectl proxy --address='0.0.0.0' --accept-hosts='^.*$' --port=8001 &
 ```
 
-Kubeconfig usato da Jenkins:
-
-```yaml
-apiVersion: v1
-clusters:
-- cluster:
-    server: http://10.0.2.2:8001
-  name: minikube
-contexts:
-- context:
-    cluster: minikube
-  name: minikube
-current-context: minikube
-kind: Config
-```
 
