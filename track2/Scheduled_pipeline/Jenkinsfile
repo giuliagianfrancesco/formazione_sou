@@ -1,0 +1,34 @@
+pipeline {
+
+    agent { label 'Jenkins-agent' }
+    stages {
+        stage('Checkout') {
+            steps {
+                script{
+                   echo "checkout"
+                }
+        }
+        }
+
+        stage('Build') {
+            steps {
+                script{
+                    def oggi = new Date().format("EEEE")
+                    if(oggi == 'Sunday' || oggi == 'Saturday')  {
+                     sh """
+                      echo 'No build in weekend'
+                    """
+                    }
+                    else {
+                     sh """
+                      echo 'build'
+                    """
+                        
+                    }
+                    
+        }
+
+    }
+}
+}
+}

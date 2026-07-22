@@ -1,0 +1,53 @@
+---
+- hosts: all
+  become: true
+  become_user: root
+
+  roles:
+    - geerlingguy.docker
+
+
+  collections:
+    - community.docker
+
+  tasks:
+    - name: Avvia e abilita il servizio Docker
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+
+    - name: Avvia i container caselle
+      community.docker.docker_container:
+        name: "{{ item }}"
+        image: ubuntu:latest
+        state: started
+        tty: true
+        volumes:
+           - "/vagrant/{{ item }}.txt:/{{ item }}.txt"
+      
+      loop:
+        - cas_1
+        - cas_2
+        - cas_3
+        - cas_4
+        - cas_5
+        - cas_6
+        - cas_7
+        - cas_8
+        - cas_9
+
+    - name: Avvia i container giocatori
+      community.docker.docker_container:
+        name: "{{ item }}"
+        image: ubuntu:latest
+        state: started
+        
+        tty: true
+        volumes:
+          - "/vagrant/script_{{ item }}.sh:/script_mossa.sh"
+          - "/vagrant/script_tris.sh:/script_tris.sh"
+      loop:
+        - gioc_1
+        - gioc_2

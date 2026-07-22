@@ -1,0 +1,28 @@
+---
+- hosts: localhost
+  
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+    so: "python:3.9-slim"
+    dir: /appFlask
+  tasks:
+
+    - name: Genera il Dockerfile dal template Jinja2
+      ansible.builtin.template:
+        src: config.j2
+        dest: dockerfile
+
+    - name: Build immagine Docker
+      community.docker.docker_image:
+        name: imm_template
+        tag: latest
+        source: build
+        build:
+          path: .
+        state: present
+
+    - name: Create a data container
+      community.docker.docker_container:
+        name: imm_template
+        image: imm_template:latest
+

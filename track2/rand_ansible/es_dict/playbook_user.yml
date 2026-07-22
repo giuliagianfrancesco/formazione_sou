@@ -1,0 +1,31 @@
+---
+- hosts: localhost
+  vars:
+    users_lists:
+      - name: Maria
+        home: /Users/maria
+        shell: /bin/zsh
+        groups: utentiprova
+          
+      - name: Mario
+        home: /Users/mario
+        shell: /bin/bash
+        groups: utentiprova
+
+      - name: Pippo
+        home: /Users/pippo
+        shell: /bin/csh
+        groups: wheel
+  tasks:
+    
+    - name: Crea utenti
+      ansible.builtin.user:
+        name: "{{ item.name }}"
+        shell: "{{ item.shell }}"
+        groups: "{{ item.groups }}"
+        create_home: yes
+        home: "{{ item.home }}"
+        
+      loop: "{{ users_list }}"
+
+

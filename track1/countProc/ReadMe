@@ -1,0 +1,22 @@
+# PID Status Counter
+
+Script Bash per contare gli stati dei processi in un intervallo di PID specificato.
+
+## Utilizzo
+```bash
+chmod +x script.sh
+./script.sh [PID_MIN] [PID_MAX]
+```
+
+## Stati Monitorati
+- S: Sleeping
+- Z: Zombie
+- R: Running
+- D: Uninterruptible Sleep
+- T: Stopped
+- I: Idle
+
+## Error Codes
+- **1**: PID massimo negativo.
+- **2**: PID minimo maggiore del massimo.
+- **3**: Entrambi gli errori.

@@ -1,0 +1,5 @@
+{% if ambiente == 'produzione' %}
+10000
+{% elif ambiente == 'sviluppo' or  ambiente == 'collaudo' %}
+1000
+{% endif %}

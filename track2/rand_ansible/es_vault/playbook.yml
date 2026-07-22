@@ -1,0 +1,13 @@
+---
+- hosts: localhost
+  vars_files:
+    - /etc/ansible/vault_pass.yml
+
+  tasks: 
+    
+    - name: Stampa valori vault
+      shell: echo "{{ item }}"
+      
+      loop: 
+        - "{{ password }}"
+        - "{{ mysecret }}"

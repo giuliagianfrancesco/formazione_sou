@@ -1,0 +1,153 @@
+---
+- hosts: vm1
+  become: true
+  become_user: root
+  vars_files:
+    - vars/vault.yml
+  tasks:
+  - name: Install prerequisite packages
+    dnf:
+      name:
+        - python3-PyMySQL
+      state: present
+
+
+  - name: Add MariaDB YUM repository
+    yum_repository:
+      name: MariaDB
+      description: "MariaDB {{ mariadb_version }} Repository"
+      baseurl: "https://dlm.mariadb.com/repo/mariadb-server/{{ mariadb_version }}/yum/rhel/{{ ansible_distribution_major_version }}/x86_64"
+      gpgkey: "https://mariadb.org/mariadb_release_signing_key.pgp"
+      gpgcheck: true
+      enabled: true
+  - name: Remove conflicting system MariaDB/MySQL packages
+    dnf:
+      name:
+        - mariadb-server
+        - mariadb-gssapi-server
+        - mariadb
+      state: absent
+  - name: Install MariaDB packages
+    dnf:
+      name:
+        - MariaDB-server
+        - MariaDB-client
+        - MariaDB-backup
+      state: present
+  - name: start mariadb service
+    ansible.builtin.service:
+      name: mariadb
+      state: started
+      enabled: true
+ 
+  - name: Create a new database with name sourcesense
+    community.mysql.mysql_db:
+      name: sourcesense
+      state: present
+      login_user: root
+      login_password: " {{ vault_mariadb_backup_password }} "
+      login_unix_socket: /var/lib/mysql/mysql.sock
+   
+  - name: query to sourcesense
+    community.mysql.mysql_query:
+      login_db: sourcesense
+      query:
+        - DROP TABLE IF EXISTS dipendenti
+        - CREATE TABLE dipendenti ( dipendente_id INT AUTO_INCREMENT PRIMARY KEY, nome VARCHAR(15), cognome VARCHAR(20), mansione VARCHAR(50))  
+        - INSERT INTO dipendenti (nome, cognome, mansione) VALUES('Giulia', 'Gianfrancesco', 'stagista')
+        - INSERT INTO dipendenti (nome, cognome, mansione) VALUES('Mario', 'Rossi', 'manager')
+        - INSERT INTO dipendenti (nome, cognome, mansione) VALUES('Pippo', 'Pippo', 'apprendista');
+      login_unix_socket: /var/lib/mysql/mysql.sock
+  - name: Pulisci la directory di backup prima di ogni run
+    ansible.builtin.file:
+      path: /var/mariadb/backup/
+      state: absent
+
+  - name: Ricrea la directory di backup vuota
+    ansible.builtin.file:
+      path: /var/mariadb/backup/
+      state: directory
+      owner: mysql
+      group: mysql
+      mode: '0750'
+  - name: Esegui backup MariaDB con mariadb-backup
+    ansible.builtin.command:
+      cmd: >
+        mariadb-backup --backup
+        --target-dir=/var/mariadb/backup/
+        --user=root
+        --password={{ vault_mariadb_backup_password }}
+ 
+
+  - name: Comprimi il backup
+    community.general.archive:
+      path: /var/mariadb/backup/
+      dest: /var/mariadb/backup.tar.gz
+      format: gz
+
+  - name: Scarica il backup compresso
+    ansible.builtin.fetch:
+      src: /var/mariadb/backup.tar.gz
+      dest: /tmp/
+      flat: yes
+- hosts: vm2
+  become: true
+  become_user: root
+  vars_files:
+    - vars/vault.yml
+  tasks:
+  
+  - name: Install prerequisite packages
+    dnf:
+      name:
+        - python3-PyMySQL
+      state: present
+
+  - name: Add MariaDB YUM repository
+    yum_repository:
+      name: MariaDB
+      description: "MariaDB {{ mariadb_version }} Repository"
+      baseurl: "https://dlm.mariadb.com/repo/mariadb-server/{{ mariadb_version }}/yum/rhel/{{ ansible_distribution_major_version }}/x86_64"
+      gpgkey: "https://mariadb.org/mariadb_release_signing_key.pgp"
+      gpgcheck: true
+      enabled: true
+  - name: Remove conflicting system MariaDB/MySQL packages
+    dnf:
+      name:
+        - mariadb-server
+        - mariadb-gssapi-server
+        - mariadb
+      state: absent
+
+  - name: Install MariaDB packages
+    dnf:
+      name:
+        - MariaDB-server
+        - MariaDB-client
+        - MariaDB-backup
+      state: present
+  - name: start mariadb service
+    ansible.builtin.service:
+      name: mariadb
+      state: started
+      enabled: true
+  - name: copia in remoto
+    ansible.builtin.copy:
+      src: /tmp/backup.tar.gz
+      dest: /var/mariadb/backup.tar.gz
+      owner: root
+      group: root
+      mode: '0644'
+  - name: Estrai il backup su vm2
+    ansible.builtin.unarchive:
+      src: /var/mariadb/backup.tar.gz
+      dest: /var/mariadb/backup/
+      remote_src: yes 
+  - name: Restore MariaDB backup on vm2
+    ansible.builtin.command:
+      cmd: >
+        mariadb-backup --prepare
+        --target-dir=/var/mariadb/backup/
+        --user=root
+        --password={{ vault_mariadb_backup_password }}
+ 

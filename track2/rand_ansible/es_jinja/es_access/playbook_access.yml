@@ -1,0 +1,24 @@
+---
+- hosts: localhost
+  become: true
+  vars:
+    utenti_wl:
+      - Maria
+      - Mario
+      - giuliagianfrancesco
+  
+  tasks:
+ 
+    - name: Set limiti
+      ansible.builtin.template:
+        src: config_acc.j2
+        dest: output_acc.txt
+      
+    - name: change limit.conf
+      ansible.builtin.blockinfile:
+          path: /etc/security/access.conf    
+          insertbefore: "^- : ALL : ALL"
+          block: "{{ lookup('ansible.builtin.file', 'output_acc.txt') }}"
+
+           
+                                          

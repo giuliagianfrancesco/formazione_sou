@@ -1,0 +1,16 @@
+---
+- hosts: localhost
+  become: true
+  vars:
+    my_dict:
+      python3: absent
+      apache2: present
+      nginx: present
+
+  tasks:
+    - name: installa pacchetti
+      apt:
+        name: "{{ item.key }}"
+        state: "{{ item.value }}"
+        update_cache: yes
+      loop: "{{ my_dict | dict2items }}"
