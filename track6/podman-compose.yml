@@ -1,0 +1,25 @@
+services:
+  app-python:
+    build: ./
+    ports:
+      - "5000:5000"
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.95.0
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+      - "9464:9464"
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml
+    command: ["--config=/etc/otelcol-contrib/config.yaml"]
+  prometheus:
+    image: docker.io/prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+
